@@ -1,15 +1,16 @@
 ﻿(define (domain complex_agriculture_domain_harpia)
 
 
-    (:requirements  :typing  :strips  :disjunctive-preconditions  :equality :numeric-fluents  )
+    (:requirements  :typing  :strips  :disjunctive-preconditions  :equality :numeric-fluents :negative-preconditions  )
 
 
     (:types
-        region crops livestock food boxes - object
+        region crop livestock food box - object
         base - region
         robot - agent
         ; crop-land box-location livestock-land food-station robot-location - location)
-        position - location)
+        position - location
+        charging-station - position)
 
     (:functions
 
@@ -73,7 +74,7 @@
         ; Is the land where the crop resides free
         (no-crop ?location - location)
         ; Determines if the crop on a particular land is ripe
-        (crop-ripe ?location - location)
+        (crop-ripe ?crop - crop ?location - location)
         ; Determines if the box is at the initial location
         (box-at-initial-location ?location - location)
         ; Livestock is hungry and needs food
@@ -86,8 +87,18 @@
         (robot_at ?robot - robot ?location - position)
         ; The goal that the livestock is fed
         (fed ?livestock - livestock)
-
-
+        ; Hand is free to grab the crop
+        (hand-free ?robot - robot)
+        ; Hand is holding object
+        (holding ?robot - robot ?crop - crop)
+        ; The location of the crop within the domain
+        (crop_at ?object - crop ?location - position)
+        ; The goal that the box contains the crop 
+        (contains ?box - box ?crop - crop)
+        ; The goal of putting the harvested crop into the box
+        (put-into-box-goal ?box - box ?crop - crop)
+        ; The box is at the location
+        (box_at ?box - box ?location - position)
         ; (can-go-to-base)
         ; (has-pulverize-goal)
         ; (has-picture-goal)
@@ -138,6 +149,66 @@
     )
     
 
+     (:action harvest_crop
+        :parameters (
+            ?crop-location - position
+            ?robot - robot
+            ?crop - crop)
+        :precondition (and
+            ; (robot_at ?robot ?food-station)
+            (robot_at ?robot ?crop-location)
+            (crop_at ?crop ?crop-location)
+            ; (not (no-crop ?crop-location))
+            (crop-ripe ?crop ?crop-location)
+            (hand-free ?robot)
+            ; (< (food-amount) (/ (2) (food-capacity)))
+        )
+        :effect 
+        (and
+            (not (hand-free ?robot))
+            (not (crop_at ?crop ?crop-location))
+            (holding ?robot ?crop)
+            (increase (mission-length) 20)
+
+        )
+    )
+
+
+    (:action recharge_battery_ground
+        :parameters (?robot - robot
+        ?battery_recharging_Station - charging-station)
+        :precondition (and
+            (robot_at ?robot ?battery_recharging_Station)
+        )
+        :effect 
+        (and
+            (assign (battery-amount) (battery-capacity))
+        )
+    )
+
+    (:action drop_crop_in_box
+        :parameters (
+            ?crop - crop
+            ?robot - robot
+            ?box-location - position
+            ?box - box)
+        :precondition (and
+            (robot_at ?robot ?box-location)
+            (holding ?robot ?crop)
+            (put-into-box-goal ?box ?crop)
+            (box_at ?box ?box-location)
+        )
+        :effect 
+        (and
+            (not (holding ?robot ?crop))
+            (hand-free ?robot)
+            (contains ?box ?crop)
+            (increase (mission-length) 20)
+
+        )
+    )
+
+
     ; Recharge the food amount to feed the livestock if food amount is less than half of food capacity
     (:action recharge_food_amount
         :parameters (
@@ -152,6 +223,7 @@
             (assign (food-amount) (food-capacity))
         )
     )
+
 
 
     (:action move_robot
