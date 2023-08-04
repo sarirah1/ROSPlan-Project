@@ -1,11 +1,12 @@
-﻿(define (domain complex_agriculture_domain_harpia)
+(define (domain complex_agriculture_domain_harpia)
 
 
-    (:requirements  :typing  :strips  :disjunctive-preconditions  :equality :numeric-fluents :negative-preconditions  )
+    ; (:requirements  :typing  :strips  :disjunctive-preconditions  :equality :numeric-fluents :negative-preconditions  )
+    (:requirements  :typing  :strips  :equality :fluents)
 
 
     (:types
-        region crop livestock food box produce - object
+        region crop livestock food box produce agent location - object
         base - region
         robot - agent
         aerial ground - robot
@@ -13,54 +14,15 @@
         position - location
         charging-station - position)
 
-    (:functions
+    
 
-        ;; Variavel q controla bateria em porcentagem
-        (battery-amount ?robot - robot)
-        ;; quantidade de insumo
-        (input-amount ?aerial - aerial)
-        ;;velocidade de carregar a bateria em porcentagem por segundos
-        (recharge-rate-battery)
-        ;;velocidade de descarregar a bateria
-        (discharge-rate-battery)
-        ;;capacidade maxima bateria
-        (battery-capacity)
-        ;;capacidade maxima de insumo
-        (input-capacity)
-        ;;velocidade de reabastecer o insumo
-        (recharge-rate-input)
-        ;;distancia entre regioes em metros
-        (distance ?from-region - region ?to-region - region)
-        ;;velocidade em m/s
-        (velocity ?robot - robot)
-        (picture-path-len ?region - region)
-        (pulverize-path-len ?region - region)
-        (total-goals)
-        (goals-achived)
-        (mission-length)
-        
-
-        ; Determines the amound of food that livestock would require
-        (food-amount ?ground - ground)
-        ; The maximum capacity of food a robot can carry
-        (food-capacity)
-        ; Distance between locations
-        (distance_location ?from - position ?to - position)
-        
-        ; Determines the amound of water that robot currently has
-        (water-amount ?ground - ground)
-        ; The maximum capacity of water a robot can carry
-        (water-capacity)
-    )
-
-
-     (:predicates
+    (:predicates
     
         (been-at ?region - region)
         ;;se esta carregando um insumo
         (carry)  
         ;;esta em uma regiao
-        (at ?robot - aerial ?region - region)
+        (aerial_at ?robot - aerial ?region - region)
         ;; se pode pulverizar
         (can-spray)
         ;;se pode carregar/descarregar
@@ -123,7 +85,47 @@
     
     )
 
+    (:functions
 
+        ;; Variavel q controla bateria em porcentagem
+        (battery-amount ?robot - robot)
+        ;; quantidade de insumo
+        (input-amount ?aerial - aerial)
+        ;;velocidade de carregar a bateria em porcentagem por segundos
+        (recharge-rate-battery)
+        ;;velocidade de descarregar a bateria
+        (discharge-rate-battery)
+        ;;capacidade maxima bateria
+        (battery-capacity)
+        ;;capacidade maxima de insumo
+        (input-capacity)
+        ;;velocidade de reabastecer o insumo
+        (recharge-rate-input)
+        ;;distancia entre regioes em metros
+        (distance ?from-region - region ?to-region - region)
+        ;;velocidade em m/s
+        (velocity ?robot - robot)
+        (picture-path-len ?region - region)
+        (pulverize-path-len ?region - region)
+        (total-goals)
+        (goals-achived)
+        (mission-length)
+        
+
+        ; Determines the amound of food that livestock would require
+        (food-amount ?ground - ground)
+        ; The maximum capacity of food a robot can carry
+        (food-capacity)
+        ; Distance between locations
+        (distance_location ?from - position ?to - position)
+        
+        ; Determines the amound of water that robot currently has
+        (water-amount ?ground - ground)
+        ; The maximum capacity of water a robot can carry
+        (water-capacity)
+    )
+
+    
     (:action feed_livestock
         :parameters (
             ?livestock - livestock
@@ -136,7 +138,7 @@
             (robot_at ?robot ?location)
             (object_at ?livestock ?location)
             (> (food-amount ?robot) 0)
-            (feed-livestock-goal ?livestock)
+            ; (feed-livestock-goal ?livestock)
             (> (battery-amount ?robot) 
                 (*
                     (/
@@ -254,7 +256,7 @@
             (robot_at ?robot ?crop-location)
             (crop_at ?crop ?crop-location)
             (> (water-amount ?robot) 0)
-            (crop-water-goal ?crop)
+            ; (crop-water-goal ?crop)
             (> (battery-amount ?robot) 
                 (*
                     (/
@@ -304,7 +306,7 @@
         :precondition (and
             (robot_at ?robot ?box-location)
             (holding ?robot ?crop)
-            (put-into-box-goal ?box ?crop)
+            ; (put-into-box-goal ?box ?crop)
             (box_at ?box ?box-location)
             (> (battery-amount ?robot) 
                 (*
@@ -344,7 +346,7 @@
         :precondition (and
             (robot_at ?robot ?box-location)
             (hold-produce ?robot ?produce)
-            (put-produce-into-box-goal ?box ?produce)
+            ; (put-produce-into-box-goal ?box ?produce)
             (box_at ?box ?box-location)
             (> (battery-amount ?robot) 
                 (*
@@ -439,13 +441,13 @@
              ?to-region - region
              ?robot - aerial)
         :precondition (and
-            (at ?robot ?from-region)
+            (aerial_at ?robot ?from-region)
             (> (battery-amount ?robot) (+ (* (/ (distance ?from-region ?to-region) (velocity ?robot)) (discharge-rate-battery)) 15))
         )
         :effect (and 
-                (not (at ?robot ?from-region))
+                (not (aerial_at ?robot ?from-region))
                 (been-at ?to-region)
-                (at ?robot ?to-region)
+                (aerial_at ?robot ?to-region)
                 (decrease (battery-amount ?robot) 
                       (*
                           (/
@@ -466,8 +468,8 @@
             ?robot - aerial
         )
         :precondition(and
-            (at ?robot ?region)
-            (picture-goal ?region)
+            (aerial_at ?robot ?region)
+            ; (picture-goal ?region)
             (> (battery-amount ?robot) 
                 (*
                     (/
@@ -498,8 +500,8 @@
             ?region - region
             ?robot - aerial)
         :precondition(and
-            (at ?robot ?region)
-            (pulverize-goal ?region)
+            (aerial_at ?robot ?region)
+            ; (pulverize-goal ?region)
             (> (input-amount ?robot) 0)
             (> (battery-amount ?robot) 
                 (*
@@ -533,7 +535,7 @@
             ?robot - aerial
             )
         :precondition (and
-            (at ?robot ?base)
+            (aerial_at ?robot ?base)
             ;(< (battery-amount) 60)
         )
         :effect 
@@ -548,7 +550,7 @@
             ?base - base
             ?robot - aerial)
         :precondition (and
-            (at ?robot ?base)
+            (aerial_at ?robot ?base)
             (< (input-amount ?robot) (/ (input-capacity) 2))
         )
         :effect 
