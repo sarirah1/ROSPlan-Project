@@ -15,4 +15,4 @@ This repository contains the code for the MSc Master's project for Goal Recognit
 
 
 
-1. 
+1. Vannini, V., de Moura Souza, G. and Toledo, C.F.M., 2023. Harpia: A hybrid system for agricultural UAV missions. Smart Agricultural Technology, 4, p.100191.
