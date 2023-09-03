@@ -3,29 +3,28 @@
 
 	<!-- arguments -->
 	<arg name="domain_path"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p0/5_goals/domain.pddl" />
-	<arg name="problem_path"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/common/problem.pddl" />
-	<arg name="data_path"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/common/" />
-	<!-- <arg name="data_path"            value="$(find rosplan_planning_system)/test/" /> -->
+	<arg name="problem_path"	default="$(find rosplan_planning_system)/test/problem.pddl" />
+	<arg name="data_path"            value="$(find rosplan_planning_system)/test/" />
     <arg name="action_dispatch_topic"	default="/rosplan_plan_dispatcher/action_dispatch" />
 	<arg name="action_feedback_topic"	default="/rosplan_plan_dispatcher/action_feedback" />
-	<arg name="hypothesis_goals"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/8_goals/hyps.dat" />
-	<arg name="temp_observations"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/8_goals/temp_obs.dat" />
-	<arg name="observations"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/8_goals/obs.dat" />
+	<arg name="hypothesis_goals"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/5_goals/hyps.dat" />
+	<arg name="temp_observations"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/5_goals/temp_obs.dat" />
+	<arg name="observations"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/5_goals/obs.dat" />
 	<arg name="initial_state"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/5_goals/initial_state.pddl" />
-	<arg name="log_file"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/8_goals/goal_mirroring_log_file_popf.txt" />
-	<!-- <arg name="log_file"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/8_goals/goal_mirroring_log_file_metric_ff.txt" /> -->
-	<arg name="real_goal"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/8_goals/real_hyp.dat" />
+	<arg name="log_file"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/5_goals/goal_mirroring_log_file_lpg_all.txt" />
+	<!-- <arg name="log_file"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/5_goals/goal_mirroring_log_file_mean.txt" /> -->
+	<!-- <arg name="log_file"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/5_goals/goal_mirroring_log_file_min.txt" /> -->
+	<arg name="real_goal"	default="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/simple_harpia_dataset/p2/5_goals/real_hyp.dat" />
+
 
 
     <!-- main coordinator -->
-    <node pkg="rosplan_project" type="goal_mirroring_simple.py" name="coordinator" respawn="false" required="false" output="screen">
+    <node pkg="rosplan_project" type="Diverse_Mirroring.py" name="coordinator" respawn="false" required="false" output="screen">
         <!-- <param name="max_prm_size"    value="$(arg max_prm_size)" /> -->
-        <param name="planner_command" value="timeout 60 $(find rosplan_planning_system)/common/bin/popf DOMAIN PROBLEM" />
-        <!-- <param name="planner_command" value="timeout 300 $(find rosplan_planning_system)/common/bin/Metric-FF -o DOMAIN -f PROBLEM" /> -->
-		<!-- <param name="planner_command"      value="timeout 60 $(find rosplan_planning_system)/common/bin/lpg-td -o DOMAIN -f PROBLEM -quality -seed 2023 -out $(find rosplan_planning_system)/test/lpgplan" /> -->
-
+		<param name="planner_command"      value="timeout 60 $(find rosplan_planning_system)/common/bin/lpg-td -o DOMAIN -f PROBLEM -n 5 -seed 2023 -out $(find rosplan_planning_system)/test/lpgplan" />
+        <!-- <param name="planner_command" value="timeout 10 $(find rosplan_planning_system)/common/bin/popf DOMAIN PROBLEM" /> -->
         <param name="domain_path"     value="$(arg domain_path)" />
-        <param name="problem_path"    value="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/common/problem.pddl" />
+        <param name="problem_path"    value="$(find rosplan_planning_system)/test/problem.pddl" />
         <param name="data_path"       value="$(arg data_path)" />
 		<param name="hypothesis_goals"       value="$(arg hypothesis_goals)" />
 		<param name="temp_observations"       value="$(arg temp_observations)" />
@@ -47,22 +46,19 @@
 	<include file="$(find rosplan_planning_system)/launch/includes/problem_interface.launch">
 		<arg name="knowledge_base"   value="rosplan_knowledge_base" />
 		<arg name="domain_path"      value="$(arg domain_path)" />
-		<arg name="problem_path"     value="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/common/problem.pddl" />
+		<arg name="problem_path"     value="$(find rosplan_planning_system)/test/problem.pddl" />
 		<arg name="problem_topic"    value="problem_instance" />
 	</include>
 
 	<!-- planner interface -->
-	<include file="$(find rosplan_planning_system)/launch/includes/planner_interface.launch">
-	<!-- <include file="$(find rosplan_planning_system)/launch/includes/planner_interface_ff_metric.launch"> -->
+	<include file="$(find rosplan_planning_system)/launch/includes/planner_interface_lpg.launch">
 		<arg name="use_problem_topic"    value="true" />
 		<arg name="problem_topic"        value="/rosplan_problem_interface/problem_instance" />
 		<arg name="planner_topic"        value="planner_output" />
 		<arg name="domain_path"          value="$(arg domain_path)" />
-		<arg name="problem_path"         value="/mnt/c/Users/Public/ROSPlan/src/rosplan/rosplan_project/common/problem.pddl" />
+		<arg name="problem_path"         value="$(find rosplan_planning_system)/test/problem.pddl" />
 		<arg name="data_path"            value="$(arg data_path)" />
-		<arg name="planner_command"      value="timeout 60 $(find rosplan_planning_system)/common/bin/popf DOMAIN PROBLEM" />
-		<!-- <arg name="planner_command"      value="timeout 300 $(find rosplan_planning_system)/common/bin/Metric-FF -o DOMAIN -f PROBLEM" /> -->
-		<!-- <arg name="planner_command"      value="timeout 60 $(find rosplan_planning_system)/common/bin/lpg-td -o DOMAIN -f PROBLEM -quality -seed 2023 -out $(find rosplan_planning_system)/test/lpgplan" /> -->
+		<arg name="planner_command"      value="timeout 60 $(find rosplan_planning_system)/common/bin/lpg-td -o DOMAIN -f PROBLEM -n 5 -seed 2023 -out $(find rosplan_planning_system)/test/lpgplan" />
 
 	</include>
 
@@ -98,4 +94,5 @@
     <include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
 		<arg name="pddl_action_name" value="recharge_input" />
 	</include>
+    
 </launch>

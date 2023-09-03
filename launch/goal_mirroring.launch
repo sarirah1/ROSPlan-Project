@@ -25,7 +25,7 @@
 
 
     <!-- main coordinator -->
-    <node pkg="rosplan_project" type="goal_mirroring.py" name="coordinator" respawn="false" required="false" output="screen">
+    <node pkg="rosplan_project" type="Goal_Mirroring.py" name="coordinator" respawn="false" required="false" output="screen">
         <!-- <param name="max_prm_size"    value="$(arg max_prm_size)" /> -->
         <param name="planner_command" value="timeout 60 $(find rosplan_planning_system)/common/bin/popf DOMAIN PROBLEM" />
         <!-- <param name="planner_command" value="timeout 300 $(find rosplan_planning_system)/common/bin/Metric-FF -o DOMAIN -f PROBLEM" /> -->
