@@ -1,0 +1,5 @@
+(wet crop_2),(pulverized region_4),(wet crop_1),(pulverized region_2),(taken-image region_3)
+(wet crop_5),(pulverized region_3),(wet crop_1),(pulverized region_5),(taken-image region_2)
+(contains box_1 crop_5),(contains box_2 crop_2),(wet crop_2),(pulverized region_1),(taken-image region_5)
+(wet crop_5),(pulverized region_3),(pulverized region_4),(taken-image region_2),(taken-image region_4)
+(fed livestock_3),(pulverized region_3),(wet crop_2),(pulverized region_2),(taken-image region_2)
